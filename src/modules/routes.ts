@@ -1,4 +1,4 @@
 export const routes = {
-  testSessionList: "/sessions",
+  testSessionsList: () => "/sessions",
   testSession: (id: string) => `/sessions/${id}`,
 };
