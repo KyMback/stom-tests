@@ -1,4 +1,4 @@
-import { Button, Container, Stack } from "@mui/material";
+import { Button, Container, Stack, Typography } from "@mui/material";
 import {
   Header,
   QuestionPanel,
@@ -171,7 +171,6 @@ const Content = ({ session, test }: { session: TestSession; test: Test }) => {
   const next = () => dispatch({ type: "next" });
   const previous = () => dispatch({ type: "previous" });
   const check = () => dispatch({ type: "check" });
-  const selectTest = (id: string) => dispatch({ type: "selectTest", id });
   const selectAnswers = (answers: number[]) =>
     dispatch({ type: "selectAnswers", answers });
 
@@ -192,7 +191,17 @@ const Content = ({ session, test }: { session: TestSession; test: Test }) => {
 
   return (
     <>
-      <Header title={state.test.title} onSideMenuClick={onSideMenuToggle} />
+      <Header
+        title={
+          <>
+            <Typography>{state.session.test.name}</Typography>
+            <Typography variant="subtitle2">
+              {new Date(state.session.createdAt).toLocaleString("ru")}
+            </Typography>
+          </>
+        }
+        onSideMenuClick={onSideMenuToggle}
+      />
       <Container>
         <QuestionsAllDrawer
           open={isSideMenuOpened}
