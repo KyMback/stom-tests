@@ -100,7 +100,7 @@ export interface TestSession {
   answers: Record<
     number,
     {
-      answered: boolean;
+      state: "successful" | "failed" | "pending" | "undetermined";
       answers: number[];
     }
   >;

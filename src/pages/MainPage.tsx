@@ -4,30 +4,31 @@ import {
   QuestionPanel,
   QuestionsAllDrawer,
   QuestionsAnswersFeedback,
+  routes,
 } from "../modules";
-import { Question, Test, testsAll } from "../core";
-import { useCallback, useReducer, useState } from "react";
+import {
+  Question,
+  Test,
+  TestSession,
+  isCorrectAnswer,
+  testSessionsStore,
+  testsAll,
+} from "../core";
+import { useCallback, useEffect, useReducer, useState } from "react";
+import { Navigate, useParams } from "react-router-dom";
 
 type State = {
   test: Test;
   question: Question;
-  showAnswers: boolean;
-  answers: number[];
-};
-
-const initState: State = {
-  test: testsAll[0],
-  question: testsAll[0].questions[0],
-  showAnswers: false,
-  answers: [],
+  session: TestSession;
 };
 
 const reducer = (
   state: State,
   action:
     | { type: "next" }
-    | { type: "previos" }
-    | { type: "showAnswers" }
+    | { type: "previous" }
+    | { type: "check" }
     | { type: "selectQuestion"; questionNumber: number }
     | { type: "selectTest"; id: string }
     | { type: "selectAnswers"; answers: number[] }
@@ -35,72 +36,141 @@ const reducer = (
   const currentQuestionIndex = state.test.questions.indexOf(state.question);
 
   switch (action.type) {
-    case "next":
+    case "next": {
+      const newQuestion =
+        currentQuestionIndex === state.test.questions.length - 1
+          ? state.test.questions[0]
+          : state.test.questions[currentQuestionIndex + 1];
+
       return {
         ...state,
-        showAnswers: false,
-        answers: [],
-        question:
-          currentQuestionIndex === state.test.questions.length - 1
-            ? state.test.questions[0]
-            : state.test.questions[currentQuestionIndex + 1],
+        question: newQuestion,
+        session: {
+          ...state.session,
+          answers: {
+            ...state.session.answers,
+            [newQuestion.number]: state.session.answers[newQuestion.number]
+              ? state.session.answers[newQuestion.number]
+              : {
+                  state: "pending",
+                  answers: [],
+                },
+          },
+        },
       };
-    case "previos":
+    }
+    case "previous": {
+      const newQuestion =
+        currentQuestionIndex === 0
+          ? state.test.questions[state.test.questions.length - 1]
+          : state.test.questions[currentQuestionIndex - 1];
+
       return {
         ...state,
-        showAnswers: false,
-        answers: [],
-        question:
-          currentQuestionIndex === 0
-            ? state.test.questions[state.test.questions.length - 1]
-            : state.test.questions[currentQuestionIndex - 1],
+        question: newQuestion,
+        session: {
+          ...state.session,
+          answers: {
+            ...state.session.answers,
+            [newQuestion.number]: state.session.answers[newQuestion.number]
+              ? state.session.answers[newQuestion.number]
+              : {
+                  state: "pending",
+                  answers: [],
+                },
+          },
+        },
       };
-    case "showAnswers":
-      return { ...state, showAnswers: true };
-    case "selectQuestion":
+    }
+
+    case "check": {
+      const actual = state.session.answers[state.question.number]?.answers;
+      const expected = state.test.questions.find(
+        (e) => e.number == state.question.number
+      )!.correctAnswers;
+
+      return {
+        ...state,
+        session: {
+          ...state.session,
+          answers: {
+            ...state.session.answers,
+            [state.question.number]: {
+              state:
+                expected.length === 0
+                  ? "undetermined"
+                  : isCorrectAnswer(actual, expected)
+                  ? "successful"
+                  : "failed",
+              answers:
+                state.session.answers[state.question.number]?.answers ?? [],
+            },
+          },
+        },
+      };
+    }
+
+    case "selectQuestion": {
       if (action.questionNumber === state.question.number) {
         return state;
       }
 
+      const newQuestion = state.test.questions.find(
+        (e) => e.number === action.questionNumber
+      )!;
+
       return {
         ...state,
-        question: state.test.questions.find(
-          (e) => e.number === action.questionNumber
-        )!,
-        showAnswers: false,
-        answers: [],
-      };
-    case "selectTest": {
-      if (action.id === state.test.id) {
-        return state;
-      }
-
-      const newTest = testsAll.find((test) => test.id === action.id)!;
-
-      return {
-        test: newTest,
-        question: newTest.questions[0],
-        showAnswers: false,
-        answers: [],
+        question: newQuestion,
+        session: {
+          ...state.session,
+          answers: {
+            ...state.session.answers,
+            [newQuestion.number]: state.session.answers[newQuestion.number]
+              ? state.session.answers[newQuestion.number]
+              : {
+                  state: "pending",
+                  answers: [],
+                },
+          },
+        },
       };
     }
+
     case "selectAnswers":
       return {
         ...state,
-        answers: action.answers,
+        session: {
+          ...state.session,
+          answers: {
+            ...state.session.answers,
+            [state.question.number]: {
+              state: "pending",
+              answers: action.answers,
+            },
+          },
+        },
       };
     default:
       return state;
   }
 };
 
-export const MainPage = () => {
-  const [state, dispatch] = useReducer(reducer, initState);
+const Content = ({ session, test }: { session: TestSession; test: Test }) => {
+  const [state, dispatch] = useReducer(reducer, {
+    test: test,
+    session: session,
+    question: test.questions[0],
+  });
   const [isSideMenuOpened, setIsSideMenuOpened] = useState(false);
 
+  useEffect(() => {
+    testSessionsStore.save(state.session);
+  }, [state.session]);
+
   const next = () => dispatch({ type: "next" });
-  const previous = () => dispatch({ type: "previos" });
-  const showAnswers = () => dispatch({ type: "showAnswers" });
+  const previous = () => dispatch({ type: "previous" });
+  const check = () => dispatch({ type: "check" });
   const selectTest = (id: string) => dispatch({ type: "selectTest", id });
   const selectAnswers = (answers: number[]) =>
     dispatch({ type: "selectAnswers", answers });
@@ -116,39 +186,39 @@ export const MainPage = () => {
   const onSideMenuOpen = useCallback(() => setIsSideMenuOpened(true), []);
   const onSideMenuClose = useCallback(() => setIsSideMenuOpened(false), []);
 
+  const { answers, state: answerState } = state.session.answers[
+    state.question.number
+  ] ?? { answers: [], state: "pending" };
+
   return (
     <>
-      <Header
-        title={state.test.title}
-        onSideMenuClick={onSideMenuToggle}
-        onTestSelected={selectTest}
-        tests={testsAll}
-      />
+      <Header title={state.test.title} onSideMenuClick={onSideMenuToggle} />
       <Container>
         <QuestionsAllDrawer
           open={isSideMenuOpened}
           onOpen={onSideMenuOpen}
           onClose={onSideMenuClose}
-          questions={state.test.questions}
+          test={state.test}
+          session={state.session}
           onSelectQuestion={onSelectQuestion}
         />
         <QuestionPanel
           onSelectedAsnwersChange={selectAnswers}
-          selectedAnswers={state.answers}
+          selectedAnswers={answers}
           question={state.question}
         />
-        {state.showAnswers && (
+        {answerState !== "pending" && (
           <QuestionsAnswersFeedback
             answers={state.question.answers}
             correctAnswers={state.question.correctAnswers}
-            selectedAnswers={state.answers}
+            selectedAnswers={answers}
           />
         )}
         <Stack justifyContent="space-between" spacing={2} direction="row">
           <Button variant="contained" onClick={previous}>
             Назад
           </Button>
-          <Button variant="contained" onClick={showAnswers}>
+          <Button variant="contained" onClick={check}>
             Проверить
           </Button>
           <Button variant="contained" onClick={next}>
@@ -158,4 +228,17 @@ export const MainPage = () => {
       </Container>
     </>
   );
+};
+
+export const MainPage = () => {
+  const { sessionId } = useParams<{ sessionId: string }>();
+
+  const session = testSessionsStore.get(sessionId ?? "");
+  const test = testsAll.find((e) => e.id === session?.test.id);
+
+  if (session == null || test == null) {
+    return <Navigate to={routes.testSessionsList()} />;
+  }
+
+  return <Content session={session} test={test} />;
 };

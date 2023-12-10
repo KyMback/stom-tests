@@ -1,13 +1,14 @@
 import { SwipeableDrawer, Box, ButtonGroup, Button } from "@mui/material";
 import { chunk } from "lodash-es";
-import { Question } from "../../core";
+import { Question, Test, TestSession } from "../../core";
 import { memo, useMemo } from "react";
 
 interface Props {
   open: boolean;
   onOpen: () => void;
   onClose: () => void;
-  questions: Question[];
+  session: TestSession;
+  test: Test;
   onSelectQuestion: (question: Question) => void;
 }
 
@@ -15,7 +16,8 @@ export const QuestionsAllDrawer = ({
   onClose,
   onOpen,
   open,
-  questions,
+  test,
+  session,
   onSelectQuestion,
 }: Props) => {
   return (
@@ -26,53 +28,68 @@ export const QuestionsAllDrawer = ({
       onClose={onClose}
     >
       <Box width={300}>
-        <Questions questions={questions} onSelectQuestion={onSelectQuestion} />
+        <Questions
+          test={test}
+          session={session}
+          onSelectQuestion={onSelectQuestion}
+        />
       </Box>
     </SwipeableDrawer>
   );
 };
 
-const Questions = memo(
+const Questions = ({
+  onSelectQuestion,
+  test,
+  session,
+}: Pick<Props, "test" | "session" | "onSelectQuestion">) => {
+  const chunks = useMemo(() => chunk(test.questions, 5), [test.questions]);
+
+  return (
+    <Box width={300}>
+      {chunks.map((c, index) => (
+        <ButtonGroup key={index} size="small" fullWidth variant="outlined">
+          {c.map((question) => (
+            <QuestionButton
+              key={question.number}
+              onSelectQuestion={onSelectQuestion}
+              question={question}
+              answer={session.answers[question.number]}
+            />
+          ))}
+        </ButtonGroup>
+      ))}
+    </Box>
+  );
+};
+
+const QuestionButton = memo(
   ({
+    question,
+    answer,
     onSelectQuestion,
-    questions,
-  }: Pick<Props, "questions" | "onSelectQuestion">) => {
-    const chunks = useMemo(() => chunk(questions, 5), [questions]);
+  }: {
+    question: Question;
+    answer?: TestSession["answers"][number];
+    onSelectQuestion: (question: Question) => void;
+  }) => {
+    const color =
+      answer?.state === "successful"
+        ? "success"
+        : answer?.state === "failed"
+        ? "error"
+        : undefined;
 
     return (
-      <Box width={300}>
-        {chunks.map((c, index) => (
-          <Group
-            key={index}
-            questions={c}
-            onSelectQuestion={onSelectQuestion}
-          />
-        ))}
-      </Box>
-    );
-  }
-);
-
-const Group = memo(
-  ({
-    questions,
-    onSelectQuestion,
-  }: Pick<Props, "onSelectQuestion" | "questions">) => {
-    return (
-      <ButtonGroup size="small" fullWidth variant="outlined">
-        {questions.map((question) => (
-          <Button
-            onClick={() => onSelectQuestion(question)}
-            // variant={
-            //   selectedQuestion.number === e.number ? "contained" : undefined
-            // }
-            key={question.number}
-            value={question.number}
-          >
-            {question.number}
-          </Button>
-        ))}
-      </ButtonGroup>
+      <Button
+        onClick={() => onSelectQuestion(question)}
+        key={question.number}
+        value={question.number}
+        color={color}
+        variant={color ? "contained" : undefined}
+      >
+        {question.number}
+      </Button>
     );
   }
 );

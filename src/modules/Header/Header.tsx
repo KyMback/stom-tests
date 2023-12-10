@@ -10,20 +10,16 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
+import { useNavigate } from "react-router-dom";
+import { routes } from "..";
 
 interface Props {
   onSideMenuClick: () => void;
   title: string;
-  tests: { id: string; title: string }[];
-  onTestSelected: (testId: string) => void;
 }
 
-export const Header = ({
-  onSideMenuClick,
-  title,
-  tests,
-  onTestSelected,
-}: Props) => {
+export const Header = ({ onSideMenuClick, title }: Props) => {
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -61,20 +57,14 @@ export const Header = ({
             open={anchorEl != null}
             onClose={handleClose}
           >
-            {tests.map((e) => (
-              <MenuItem
-                key={e.id}
-                onClick={() => {
-                  handleClose();
-                  onTestSelected(e.id);
-                }}
-              >
-                <Typography noWrap>{e.title}</Typography>
-              </MenuItem>
-            ))}
-            {/* <MenuItem onClick={handleClose}>Выбрать тест</MenuItem> */}
-            {/* <MenuItem onClick={handleClose}>Мои сессии</MenuItem>
-            <MenuItem onClick={handleClose}>Новая сессия</MenuItem> */}
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                navigate(routes.testSessionsList());
+              }}
+            >
+              <Typography noWrap>Мои сессии</Typography>
+            </MenuItem>
           </Menu>
         </Box>
       </Toolbar>
