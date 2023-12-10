@@ -4,13 +4,33 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
 import CssBaseline from "@mui/material/CssBaseline";
-import { MainPage } from "./pages/MainPage";
+import {
+  Navigate,
+  RouterProvider,
+  createBrowserRouter,
+} from "react-router-dom";
+import { MainPage, TestSessionsListPage } from "./pages";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Navigate to="/sessions" />,
+  },
+  {
+    path: "/sessions",
+    element: <TestSessionsListPage />,
+  },
+  {
+    path: "/sessions/:sessionId",
+    element: <MainPage />,
+  },
+]);
 
 export const App = () => {
   return (
     <>
       <CssBaseline />
-      <MainPage />
+      <RouterProvider router={router} />
     </>
   );
 };
