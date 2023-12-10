@@ -4,14 +4,10 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
 import CssBaseline from "@mui/material/CssBaseline";
-import {
-  Navigate,
-  RouterProvider,
-  createBrowserRouter,
-} from "react-router-dom";
+import { Navigate, RouterProvider, createHashRouter } from "react-router-dom";
 import { MainPage, TestSessionsListPage } from "./pages";
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <Navigate to="/sessions" />,

@@ -17,11 +17,7 @@ class TestSessionsManager {
 
     const items = localStorage.getItem(this.listKey());
 
-    if (!items) {
-      return [];
-    }
-
-    return (this.cache.list = JSON.parse(items));
+    return (this.cache.list = !items ? [] : JSON.parse(items));
   };
 
   private saveList = (items: TestSessionListItem[]) => {
