@@ -162,7 +162,7 @@ export const MainPage = () => {
         onTestSelected={selectTest}
         tests={allTests}
       />
-      <Container maxWidth="xs">
+      <Container>
         <QuestionsAllDrawer
           open={isSideMenuOpened}
           onOpen={onSideMenuOpen}
