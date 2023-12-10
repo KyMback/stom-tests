@@ -8,14 +8,14 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate } from "react-router-dom";
 import { routes } from "..";
 
 interface Props {
   onSideMenuClick: () => void;
-  title: string;
+  title: ReactNode;
 }
 
 export const Header = ({ onSideMenuClick, title }: Props) => {
