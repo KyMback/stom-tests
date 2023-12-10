@@ -1,5 +1,5 @@
 import { Alert, Typography } from "@mui/material";
-import { isEmpty, orderBy, xor } from "lodash";
+import { isEmpty, xor } from "lodash-es";
 import { Answer } from "../../core";
 import { textWithNumber } from "../../utils";
 
@@ -23,7 +23,7 @@ export const QuestionsAnswersFeedback = ({
   return (
     <Alert severity={hasError ? "error" : "success"}>
       Правильные ответы:
-      {orderBy(correctAnswers, (e) => e, "asc").map((answerNumber) => {
+      {correctAnswers.map((answerNumber) => {
         const answer = answers.find((e) => e.number === answerNumber);
 
         return (

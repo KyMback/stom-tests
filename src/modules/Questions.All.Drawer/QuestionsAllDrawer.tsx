@@ -1,5 +1,5 @@
 import { SwipeableDrawer, Box, ButtonGroup, Button } from "@mui/material";
-import { chunk } from "lodash";
+import { chunk } from "lodash-es";
 import { Question } from "../../core";
 import { memo, useMemo } from "react";
 

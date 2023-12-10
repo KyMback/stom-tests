@@ -7,7 +7,7 @@ import {
   QuestionsAllDrawer,
   QuestionsAnswersFeedback,
 } from "../modules";
-import { orderBy } from "lodash";
+import { orderBy } from "lodash-es";
 import { Question, Test } from "../core";
 import { useCallback, useReducer, useState } from "react";
 
