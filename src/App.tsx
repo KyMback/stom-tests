@@ -5,7 +5,7 @@ import "@fontsource/roboto/700.css";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import { Navigate, RouterProvider, createHashRouter } from "react-router-dom";
-import { MainPage, TestSessionsListPage } from "./pages";
+import { TestSessionPage, TestSessionsListPage } from "./pages";
 
 const router = createHashRouter([
   {
@@ -18,7 +18,7 @@ const router = createHashRouter([
   },
   {
     path: "/sessions/:sessionId",
-    element: <MainPage />,
+    element: <TestSessionPage />,
   },
 ]);
 

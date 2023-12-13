@@ -1,1 +1,1 @@
-export * from "./QuestionsAllDrawer";
+export { QuestionsAllDrawer } from "./QuestionsAllDrawer";

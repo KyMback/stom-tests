@@ -1,4 +1,5 @@
 import {
+  Box,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -33,7 +34,7 @@ export const QuestionPanel = ({
           {category}
         </Typography>
       )}
-      <Typography variant="h6" align="left">
+      <Typography marginBottom="1rem" variant="h6" align="left">
         {textWithNumber(text, number)}
       </Typography>
       {type === "multiple" ? (
@@ -63,10 +64,9 @@ const MultipleAnswers = ({ answers, onChange, value }: AnswerProps) => {
   return (
     <FormControl error>
       <FormGroup>
-        {answers.map((answer) => {
-          return (
+        {answers.map((answer) => (
+          <Box key={answer.number} marginBottom="0.3em">
             <FormControlLabel
-              key={answer.number}
               control={<Checkbox />}
               checked={value.includes(answer.number)}
               onChange={(_, checked) =>
@@ -78,8 +78,8 @@ const MultipleAnswers = ({ answers, onChange, value }: AnswerProps) => {
               }
               label={textWithNumber(answer.text, answer.number)}
             />
-          );
-        })}
+          </Box>
+        ))}
       </FormGroup>
     </FormControl>
   );
@@ -90,13 +90,14 @@ const SingleAnswer = ({ answers, onChange, value }: AnswerProps) => {
     <FormControl>
       <RadioGroup>
         {answers.map((answer) => (
-          <FormControlLabel
-            key={answer.number}
-            control={<Radio />}
-            checked={value.includes(answer.number)}
-            onChange={() => onChange([answer.number])}
-            label={textWithNumber(answer.text, answer.number)}
-          />
+          <Box key={answer.number} marginBottom="0.3rem">
+            <FormControlLabel
+              control={<Radio />}
+              checked={value.includes(answer.number)}
+              onChange={() => onChange([answer.number])}
+              label={textWithNumber(answer.text, answer.number)}
+            />
+          </Box>
         ))}
       </RadioGroup>
     </FormControl>
