@@ -65,12 +65,10 @@ const reducer = (
           ...state.session,
           answers: {
             ...state.session.answers,
-            [newQuestion.number]: state.session.answers[newQuestion.number]
-              ? state.session.answers[newQuestion.number]
-              : {
-                  state: "pending",
-                  answers: [],
-                },
+            [newQuestion.number]: state.session.answers[newQuestion.number] || {
+              state: "pending",
+              answers: [],
+            },
           },
         },
       };
@@ -119,7 +117,7 @@ export const useTestSessionPageState = (test: Test, session: TestSession) => {
     nextRandom: () => {
       const notAnswered = test.questions.filter(
         (e) =>
-          !["failed", "failed", "undetermined"].includes(
+          !["failed", "successful", "undetermined"].includes(
             state.session.answers[e.number]?.state
           )
       );
