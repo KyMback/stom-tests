@@ -1,6 +1,17 @@
-import { SwipeableDrawer, Box, ButtonGroup, Button } from "@mui/material";
-import { chunk } from "lodash-es";
-import { Question, Test, TestSession } from "../../core";
+import {
+  SwipeableDrawer,
+  Box,
+  ButtonGroup,
+  Button,
+  Typography,
+} from "@mui/material";
+import { chunk, orderBy, without } from "lodash-es";
+import {
+  Question,
+  Test,
+  TestSession,
+  isQuestionRelatesToCateogry,
+} from "../../core";
 import { memo, useMemo } from "react";
 
 interface Props {
@@ -20,6 +31,8 @@ export const QuestionsAllDrawer = ({
   session,
   onSelectQuestion,
 }: Props) => {
+  const { categories, withoutCategory } = useCategories({ test });
+
   return (
     <SwipeableDrawer
       anchor="left"
@@ -27,26 +40,64 @@ export const QuestionsAllDrawer = ({
       onOpen={onOpen}
       onClose={onClose}
     >
-      <Box width={300}>
-        <Questions
-          test={test}
-          session={session}
-          onSelectQuestion={onSelectQuestion}
-        />
+      <Box width={300} padding="0.5rem">
+        {categories.map((c) => (
+          <Box marginBottom="0.5rem" key={c.number}>
+            <Typography fontWeight="bold">{c.text}</Typography>
+            <Questions
+              questions={c.questions}
+              session={session}
+              onSelectQuestion={onSelectQuestion}
+            />
+          </Box>
+        ))}
+        {withoutCategory.length != 0 && (
+          <Questions
+            questions={withoutCategory}
+            session={session}
+            onSelectQuestion={onSelectQuestion}
+          />
+        )}
       </Box>
     </SwipeableDrawer>
   );
 };
 
+interface Category {
+  number: number;
+  text: string;
+  questions: Question[];
+}
+
+const useCategories = ({ test }: Pick<Props, "test">) => {
+  return useMemo(() => {
+    const categories: Category[] = test.categories.map((c) => ({
+      ...c,
+      questions: test.questions.filter((q) =>
+        isQuestionRelatesToCateogry(c, q.number)
+      ),
+    }));
+
+    return {
+      categories,
+      withoutCategory: orderBy(
+        without(test.questions, ...categories.flatMap((e) => e.questions)),
+        (e) => e.number,
+        "asc"
+      ),
+    };
+  }, [test]);
+};
+
 const Questions = ({
   onSelectQuestion,
-  test,
+  questions,
   session,
-}: Pick<Props, "test" | "session" | "onSelectQuestion">) => {
-  const chunks = useMemo(() => chunk(test.questions, 5), [test.questions]);
+}: Pick<Props, "session" | "onSelectQuestion"> & { questions: Question[] }) => {
+  const chunks = useMemo(() => chunk(questions, 5), [questions]);
 
   return (
-    <Box width={300}>
+    <>
       {chunks.map((c, index) => (
         <ButtonGroup key={index} size="small" fullWidth variant="outlined">
           {c.map((question) => (
@@ -59,7 +110,7 @@ const Questions = ({
           ))}
         </ButtonGroup>
       ))}
-    </Box>
+    </>
   );
 };
 

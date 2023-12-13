@@ -38,7 +38,7 @@ export const Header = ({ onSideMenuClick, title }: Props) => {
         >
           <MenuIcon />
         </IconButton>
-        <Typography width="100%">{title}</Typography>
+        <Box width="100%">{title}</Box>
         <Box>
           <IconButton size="large" onClick={handleMenu} color="inherit">
             <AccountCircle />

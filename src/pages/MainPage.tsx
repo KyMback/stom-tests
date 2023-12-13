@@ -11,6 +11,7 @@ import {
   Test,
   TestSession,
   isCorrectAnswer,
+  isQuestionRelatesToCateogry,
   testSessionsStore,
   testsAll,
 } from "../core";
@@ -188,6 +189,9 @@ const Content = ({ session, test }: { session: TestSession; test: Test }) => {
   const { answers, state: answerState } = state.session.answers[
     state.question.number
   ] ?? { answers: [], state: "pending" };
+  const category = state.test.categories.find((e) =>
+    isQuestionRelatesToCateogry(e, state.question.number)
+  );
 
   return (
     <>
@@ -212,6 +216,7 @@ const Content = ({ session, test }: { session: TestSession; test: Test }) => {
           onSelectQuestion={onSelectQuestion}
         />
         <QuestionPanel
+          category={category?.text}
           onSelectedAsnwersChange={selectAnswers}
           selectedAnswers={answers}
           question={state.question}

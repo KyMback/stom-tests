@@ -13,12 +13,14 @@ import { Answer, Question } from "../../core";
 
 interface Props {
   question: Question;
+  category?: string;
   selectedAnswers: number[];
   onSelectedAsnwersChange: (value: number[]) => void;
 }
 
 export const QuestionPanel = ({
   question,
+  category,
   selectedAnswers,
   onSelectedAsnwersChange,
 }: Props) => {
@@ -26,6 +28,11 @@ export const QuestionPanel = ({
 
   return (
     <Stack>
+      {category && (
+        <Typography marginBottom="1rem" variant="h5" fontWeight="bold">
+          {category}
+        </Typography>
+      )}
       <Typography variant="h6" align="left">
         {textWithNumber(text, number)}
       </Typography>
