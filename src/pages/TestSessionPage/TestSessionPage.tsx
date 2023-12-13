@@ -1,5 +1,6 @@
 import {
   Alert,
+  Box,
   Button,
   Container,
   Slide,
@@ -65,48 +66,50 @@ const Content = ({ session, test }: { session: TestSession; test: Test }) => {
         onSideMenuClick={onSideMenuToggle}
       />
       <Container>
-        <QuestionsAllDrawer
-          open={isSideMenuOpened}
-          onOpen={onSideMenuOpen}
-          onClose={onSideMenuClose}
-          test={state.test}
-          session={state.session}
-          onSelectQuestion={onSelectQuestion}
-        />
-        <QuestionPanel
-          category={category?.text}
-          onSelectedAsnwersChange={selectAnswers}
-          selectedAnswers={answers}
-          question={state.question}
-        />
-        {answerState !== "pending" && (
-          <QuestionsAnswersFeedback
-            answers={state.question.answers}
-            correctAnswers={state.question.correctAnswers}
-            selectedAnswers={answers}
+        <Box marginTop="1rem" marginBottom="5rem">
+          <QuestionsAllDrawer
+            open={isSideMenuOpened}
+            onOpen={onSideMenuOpen}
+            onClose={onSideMenuClose}
+            test={state.test}
+            session={state.session}
+            onSelectQuestion={onSelectQuestion}
           />
-        )}
-        <Stack
-          marginTop="2rem"
-          justifyContent="space-between"
-          spacing={2}
-          direction="row"
-        >
-          <Button variant="contained" onClick={previous}>
-            Назад
-          </Button>
-          <Button variant="contained" onClick={check}>
-            Проверить
-          </Button>
-          <Button variant="contained" onClick={next}>
-            Далее
-          </Button>
-        </Stack>
-        <Stack marginTop="2rem">
-          <Button variant="contained" onClick={nextRandom}>
-            Случайный вопрос
-          </Button>
-        </Stack>
+          <QuestionPanel
+            category={category?.text}
+            onSelectedAsnwersChange={selectAnswers}
+            selectedAnswers={answers}
+            question={state.question}
+          />
+          {answerState !== "pending" && (
+            <QuestionsAnswersFeedback
+              answers={state.question.answers}
+              correctAnswers={state.question.correctAnswers}
+              selectedAnswers={answers}
+            />
+          )}
+          <Stack
+            marginTop="2rem"
+            justifyContent="space-between"
+            spacing={2}
+            direction="row"
+          >
+            <Button variant="contained" onClick={previous}>
+              Назад
+            </Button>
+            <Button variant="contained" onClick={check}>
+              Проверить
+            </Button>
+            <Button variant="contained" onClick={next}>
+              Далее
+            </Button>
+          </Stack>
+          <Stack marginTop="2rem">
+            <Button variant="contained" onClick={nextRandom}>
+              Случайный вопрос
+            </Button>
+          </Stack>
+        </Box>
       </Container>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
