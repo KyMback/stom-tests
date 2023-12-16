@@ -23,7 +23,6 @@ interface Props {
   onClose: () => void;
   session: TestSession;
   test: Test;
-  selectedQuestion: Question;
   onSelectQuestion: (question: Question) => void;
 }
 
@@ -41,7 +40,6 @@ export const QuestionsAllDrawer = ({
   onClose,
   onOpen,
   open,
-  selectedQuestion,
   test,
   session,
   onSelectQuestion,
@@ -66,7 +64,7 @@ export const QuestionsAllDrawer = ({
           getOptionLabel={(e) => e.label}
           getOptionKey={(e) => e.number}
           filterOptions={filterOptions}
-          value={options.find((e) => e.number === selectedQuestion.number)}
+          value={null}
           noOptionsText="Не найдены подходящие ответы"
           onChange={(_, value) => {
             const question = test.questions.find(

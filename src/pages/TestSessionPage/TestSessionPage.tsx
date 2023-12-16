@@ -73,7 +73,6 @@ const Content = ({ session, test }: { session: TestSession; test: Test }) => {
             onClose={onSideMenuClose}
             test={state.test}
             session={state.session}
-            selectedQuestion={state.question}
             onSelectQuestion={onSelectQuestion}
           />
           <QuestionPanel
